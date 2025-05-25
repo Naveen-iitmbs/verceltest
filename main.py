@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-import csv
+import json
 
 app = FastAPI()
 
@@ -12,14 +12,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Read marks from CSV into a dictionary
-marks_dict = {}
-with open("marks.csv") as f:
-    reader = csv.reader(f)
-    for row in reader:
-        if len(row) >= 2:
-            name, mark = row[0].strip(), int(row[1].strip())
-            marks_dict[name] = mark
+# Load marks from marks.json into a dictionary
+with open("marks.json") as f:
+    data = json.load(f)
+marks_dict = {entry["name"]: entry["marks"] for entry in data}
 
 @app.get("/api")
 def get_marks(name: list[str] = Query(...)):
